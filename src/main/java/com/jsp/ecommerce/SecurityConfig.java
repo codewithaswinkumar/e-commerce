@@ -30,6 +30,7 @@ public class SecurityConfig
 			                  .password(encoder.encode("chitti"))
 			                  .roles("USER")
 			                  .build();
+
 	  return new InMemoryUserDetailsManager(admin,user);
    }
 	@Bean
@@ -43,6 +44,7 @@ public class SecurityConfig
     			    .authorizeHttpRequests()
     			    .antMatchers("/MensPageLoad")
     			    .authenticated().and().formLogin().and().build();
+    	
     }
 	
 	@Bean
