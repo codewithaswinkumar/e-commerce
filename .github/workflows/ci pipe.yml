@@ -1,0 +1,32 @@
+name: CI Pipeline for Java 8 Spring Boot
+
+on:
+  push:
+    branches:
+      - main  # Runs on push to the main branch
+  pull_request:
+    branches:
+      - main  # Runs on pull requests to main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Uses the latest Ubuntu runner
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4  # Fetches the latest code
+
+      - name: Set Up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'  # Eclipse Temurin JDK
+          java-version: '8'
+
+      - name: Build and Test with Maven
+        run: mvn clean install --no-transfer-progress  # Builds the project and runs tests
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4  # Fix for deprecated versions
+        with:
+          name: spring-boot-app-${{ github.run_id }}  # Unique artifact name
+          path: target/*.jar  # Upload the built JAR file
