@@ -25,8 +25,15 @@ jobs:
       - name: Build and Test with Maven
         run: mvn clean install --no-transfer-progress  # Builds the project and runs tests
 
+      - name: Upload Test Reports
+        if: success() || failure()  # Uploads test reports regardless of success or failure
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: target/surefire-reports/  # Upload JUnit & Mockito test reports
+
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4  # Fix for deprecated versions
+        uses: actions/upload-artifact@v4
         with:
           name: spring-boot-app-${{ github.run_id }}  # Unique artifact name
           path: target/*.jar  # Upload the built JAR file
