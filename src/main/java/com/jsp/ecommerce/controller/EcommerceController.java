@@ -5,15 +5,20 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.aspectj.weaver.ast.HasAnnotation;
+import org.apache.catalina.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.env.Environment;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.jsp.ecommerce.Repository.CartOwnRepository;
@@ -30,9 +35,23 @@ import com.jsp.ecommerce.entity.UserOwn;
 import com.jsp.ecommerce.entity.WishListOwn;
 import com.jsp.ecommerce.entity.WomenDress;
 import com.jsp.ecommerce.entity.WomenPage;
+
 @Controller
 public class EcommerceController 
 {
+//	@Autowired
+//	private RestTemplate restTemplate;
+//	
+//	public User userRest()
+//	{
+//		restTemplate.getForEntity(null, null, null)
+//	}
+	@Autowired
+	private Environment env; 
+	
+	@Autowired
+	private ConfigProperties configprop;
+	
 	@Autowired
 	private WomenPageRepository wrepo;
 
@@ -50,15 +69,27 @@ public class EcommerceController
 
 	@Autowired
 	private WishListOwnRepository wishRepo;
+	
+	 private static final Logger logger = LogManager.getLogger(EcommerceController.class);
    
 	
 	@RequestMapping("/")
 	 public String print(HttpServletRequest req)
 	    {
+		 logger.debug("Debug message - Useful for debugging");
+	       
+		 System.err.println(env.getProperty("spring.mvc.view.suffix")); 
+		 System.err.println(env.getProperty("spring.datasource.url")); 
+		 
+		 System.err.println(configprop.getDriverClassName());
+		 System.err.println(configprop.getUrl());
+		 System.err.println(configprop.getUser());
+		 System.err.println(configprop.getPassword());
+		 
 		  HttpSession s3 = req.getSession();
 			String data = (String) s3.getAttribute("login");
-			System.out.println(data);
 	    	return "Home";
+	    	
 	    }
 	
 	//<<<<MEN PAGE CONTROLLER>>>>//
@@ -68,10 +99,11 @@ public class EcommerceController
 	    public String menCategoryPage(Model model) {
 	       
 	        List<MenCategory> list = mencate.findAll();
-	      
+	        logger.info("Info message - General application flow");
+	       
 	        // Add the men's category data to the model
 	        model.addAttribute("menCategories", list);
-
+	        
 	        // Return the name of the view associated with the men's category page
 	        return "Mens"; // Assuming "men_category.html" is the view template
 	    }
@@ -79,10 +111,14 @@ public class EcommerceController
 	 @RequestMapping("/loadShirtsPage")
 	 public String menItemsLoad(int catId,Model model)
 	 {
-		 
+		 logger.warn("Warn message - Something might go wrong");
+	       
 		List<MenProductsOwn> list = menOwnRepo.findByCategoryId(catId);
 		 
 		 model.addAttribute("menShirts", list);
+	//	 MenProductsOwn e=new MenProductsOwn();   //contructor joinpoint
+		 logger.error("Error message - Something went wrong...!!!!!!!");
+		
 		 
 		 return "MenShirts";
 		 
@@ -188,10 +224,13 @@ public class EcommerceController
 	private WomenDressRepository wdrepo;
 	
 	@RequestMapping("/womenDresses")
-	public String womenDressLoad(Model model)
+	public String womenDressLoad(Model model) 
 	{
 		List<WomenDress> list = wdrepo.findAll();
 		model.addAttribute("womenPage", list);
+		
+	//	int a=245/0;   example of @afterThrowing aspects
+		
 		return "WomenDresses";
 	}
 	

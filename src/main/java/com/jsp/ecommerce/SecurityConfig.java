@@ -42,7 +42,7 @@ public class SecurityConfig
     			    .permitAll()
     			    .and()
     			    .authorizeHttpRequests()
-    			    .antMatchers("/MensPageLoad")
+    			    .antMatchers("/MensPageLoad")//.hasRole("ADMIN")
     			    .authenticated().and().formLogin().and().build();
     	
     }

@@ -191,7 +191,8 @@ button {
             	{           
                     %> 
                    
-                   <form action="loadShirtsPage">
+                   <form action=<%=mc.getUrl_controllcls() %>>
+                   
 			<div class="maincard">
 			    
 			      <input hidden="true" value=<%=mc.getCategoryId()%> name="catId">

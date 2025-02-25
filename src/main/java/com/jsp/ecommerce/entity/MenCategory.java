@@ -23,6 +23,7 @@ public class MenCategory
 	private String prodType;
 	private String info;
 	private String filePath;
+	private String Url_controllcls;
 	
 	
 	

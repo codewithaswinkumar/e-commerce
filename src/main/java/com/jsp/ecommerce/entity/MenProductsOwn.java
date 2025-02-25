@@ -26,4 +26,9 @@ public class MenProductsOwn
   private String originalCost;
   @JoinColumn(name = "Category_Id")
   private Integer categoryId;
+  
+//  public MenProductsOwn()
+//  {
+//	  System.err.println("######################################################################");
+//  }
 }
