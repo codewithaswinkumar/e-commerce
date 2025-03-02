@@ -9,11 +9,27 @@
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n</Pattern>
             </PatternLayout>
         </File>
+        
+    <SplunkHttp
+        name="splunkhttp"  
+        url="http://localhost:8088"  
+        token="a47096ef-0a44-4e81-a77c-c5da8651063d"  
+        host="localhost"  
+        index="splunk_ne"  
+        type="raw"  
+        source="project_log"  
+        sourcetype="log4j"  
+        messageFormat="text"  
+        disableCertificateValidation="true"  >
+      <PatternLayout pattern="%m" />
+     </SplunkHttp>  
+        
     </Appenders>
     <Loggers>
         <Root level="info">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="FileLogger"/>
+         <AppenderRef ref="FileLogger"/>   
+            <AppenderRef ref="splunkhttp"/>
         </Root>
     </Loggers>
 </Configuration>

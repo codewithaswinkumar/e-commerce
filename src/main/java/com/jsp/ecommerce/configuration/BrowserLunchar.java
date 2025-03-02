@@ -17,7 +17,7 @@ public class BrowserLunchar
 	  Desktop desk = Desktop.getDesktop();
 	  try 
 	  {
-		desk.browse(new URI("http://localhost:8080"));
+		desk.browse(new URI("http://localhost:9090"));
 		
 	} 
 	  catch (Exception e) 

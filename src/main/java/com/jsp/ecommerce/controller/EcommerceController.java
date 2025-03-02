@@ -5,20 +5,19 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.catalina.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
-import org.springframework.security.access.prepost.PreAuthorize;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.jsp.ecommerce.Repository.CartOwnRepository;
@@ -70,17 +69,18 @@ public class EcommerceController
 	@Autowired
 	private WishListOwnRepository wishRepo;
 	
+	@Autowired
+	private Mapper mapper;
 	 private static final Logger logger = LogManager.getLogger(EcommerceController.class);
    
 	
 	@RequestMapping("/")
 	 public String print(HttpServletRequest req)
 	    {
-		 logger.debug("Debug message - Useful for debugging");
+		 logger.info("EcommerceController : home page start ");
 	       
 		 System.err.println(env.getProperty("spring.mvc.view.suffix")); 
 		 System.err.println(env.getProperty("spring.datasource.url")); 
-		 
 		 System.err.println(configprop.getDriverClassName());
 		 System.err.println(configprop.getUrl());
 		 System.err.println(configprop.getUser());
@@ -88,6 +88,8 @@ public class EcommerceController
 		 
 		  HttpSession s3 = req.getSession();
 			String data = (String) s3.getAttribute("login");
+			 logger.info("EcommerceController : home page end");
+
 	    	return "Home";
 	    	
 	    }
@@ -95,29 +97,32 @@ public class EcommerceController
 	//<<<<MEN PAGE CONTROLLER>>>>//
 	
 	 @RequestMapping("/MensPageLoad")
-	 @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+//	 @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+	 
 	    public String menCategoryPage(Model model) {
 	       
+	        
+	        logger.info("EcommerceController : menCategoryPage start ");
 	        List<MenCategory> list = mencate.findAll();
-	        logger.info("Info message - General application flow");
-	       
 	        // Add the men's category data to the model
 	        model.addAttribute("menCategories", list);
-	        
+	       logger.info("EcommerceController : menCategoryPage end {}",Mapper.mapToJsonString(list));
+
 	        // Return the name of the view associated with the men's category page
 	        return "Mens"; // Assuming "men_category.html" is the view template
 	    }
-	 
+	 @Cacheable(value ="menitems")
 	 @RequestMapping("/loadShirtsPage")
 	 public String menItemsLoad(int catId,Model model)
 	 {
-		 logger.warn("Warn message - Something might go wrong");
-	       
+		 
+	      logger.info("EcommerceController : menItempage start {} ",catId);
+
 		List<MenProductsOwn> list = menOwnRepo.findByCategoryId(catId);
 		 
 		 model.addAttribute("menShirts", list);
 	//	 MenProductsOwn e=new MenProductsOwn();   //contructor joinpoint
-		 logger.error("Error message - Something went wrong...!!!!!!!");
+		 logger.info("EcommerceController : menItempage end  {}",Mapper.mapToJsonString(list));
 		
 		 
 		 return "MenShirts";
@@ -125,6 +130,7 @@ public class EcommerceController
 	 }
 
 		List<CartOwn> h;
+		@CachePut(value = "carts", key = "#cid")
 		@RequestMapping("/addcM")
 		public String addCartMen(Integer cid , Model model,HttpServletRequest req)
 		
@@ -362,7 +368,7 @@ public class EcommerceController
 		}
 	
 	}
-	
+	@CacheEvict(value = "carts", key = "#id")
 	@RequestMapping("/deleteCart")
 	public String deleteItem(Integer id , HttpServletRequest req)
 	{
